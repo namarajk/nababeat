@@ -1,835 +1,699 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NABA — Beat Producer</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --black: #080808;
-    --white: #f0ece3;
-    --red: #ff2d2d;
-    --red-dim: #8a0000;
-    --grey: #1a1a1a;
-    --grey-mid: #2e2e2e;
-    --muted: #555;
-    --accent: #ff2d2d;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naba Beats — Music Production & Engineering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070707;
+      --panel: #111111;
+      --panel-soft: #181818;
+      --text: #f4f4f4;
+      --muted: #9aa2b1;
+      --accent: #33c7ff;
+      --accent-alt: #ff6b42;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 28px 80px rgba(0,0,0,0.28);
+    }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    overflow-x: hidden;
-    cursor: none;
-  }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at top left, rgba(51,199,255,0.08), transparent 28%),
+                  radial-gradient(circle at bottom right, rgba(255,107,66,0.08), transparent 26%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  /* CUSTOM CURSOR */
-  .cursor {
-    position: fixed;
-    width: 12px; height: 12px;
-    background: var(--red);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.08s ease, width 0.2s, height 0.2s, background 0.2s;
-    mix-blend-mode: normal;
-  }
-  .cursor-ring {
-    position: fixed;
-    width: 36px; height: 36px;
-    border: 1px solid rgba(255,45,45,0.5);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.18s ease, width 0.3s, height 0.3s, border-color 0.3s;
-  }
-  body:hover .cursor { opacity: 1; }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cpath fill="rgba(255,255,255,0.02)" d="M0 0h100v100H0z"/%3E%3C/svg%3E');
+      opacity: 0.12;
+      pointer-events: none;
+    }
 
-  /* NOISE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.3;
-  }
+    a { color: inherit; text-decoration: none; }
 
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 48px;
-    mix-blend-mode: normal;
-  }
-  nav::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(8,8,8,0.9) 0%, transparent 100%);
-    z-index: -1;
-  }
-  .nav-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 4px;
-    color: var(--white);
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--red); }
-  .nav-links {
-    display: flex;
-    gap: 40px;
-    list-style: none;
-  }
-  .nav-links a {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--white); }
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+    }
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 120px 48px 80px;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(139,0,0,0.12) 0%, transparent 70%),
-      radial-gradient(ellipse 30% 40% at 20% 80%, rgba(255,45,45,0.06) 0%, transparent 60%);
-  }
-  .hero-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0;
-    animation: fadeUp 0.8s ease forwards 0.3s;
-  }
-  .hero-tag::before {
-    content: '';
-    width: 40px; height: 1px;
-    background: var(--red);
-  }
-  .hero-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(80px, 16vw, 200px);
-    line-height: 0.88;
-    letter-spacing: -2px;
-    color: var(--white);
-    opacity: 0;
-    animation: fadeUp 0.9s ease forwards 0.5s;
-  }
-  .hero-name .outline {
-    -webkit-text-stroke: 1px rgba(240,236,227,0.25);
-    color: transparent;
-  }
-  .hero-name .red { color: var(--red); }
-  .hero-sub {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 18px;
-    font-weight: 300;
-    color: var(--muted);
-    margin-top: 32px;
-    max-width: 420px;
-    line-height: 1.7;
-    opacity: 0;
-    animation: fadeUp 0.9s ease forwards 0.75s;
-  }
-  .hero-cta {
-    margin-top: 52px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-    opacity: 0;
-    animation: fadeUp 0.9s ease forwards 0.95s;
-  }
-  .btn-primary {
-    background: var(--red);
-    color: var(--white);
-    padding: 14px 32px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: none;
-    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-    transition: background 0.2s, transform 0.15s;
-    cursor: none;
-    display: inline-block;
-  }
-  .btn-primary:hover { background: #cc0000; transform: translateY(-2px); }
-  .btn-ghost {
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    text-decoration: none;
-    border-bottom: 1px solid var(--grey-mid);
-    padding-bottom: 4px;
-    transition: color 0.2s, border-color 0.2s;
-    cursor: none;
-  }
-  .btn-ghost:hover { color: var(--white); border-color: var(--white); }
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(24px);
+      background: rgba(7,7,7,0.82);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      z-index: 10;
+    }
 
-  /* SCROLLING TICKER */
-  .ticker-wrap {
-    background: var(--red);
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 14px 0;
-    position: relative;
-    z-index: 10;
-  }
-  .ticker {
-    display: inline-block;
-    animation: ticker 20s linear infinite;
-  }
-  .ticker span {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 6px;
-    margin: 0 40px;
-    color: var(--black);
-  }
-  .ticker span.dot { font-size: 8px; opacity: 0.5; }
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.25rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
 
-  /* SECTION BASE */
-  section {
-    padding: 100px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .section-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: var(--red);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--grey-mid);
-    max-width: 60px;
-  }
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(40px, 6vw, 80px);
-    letter-spacing: 2px;
-    line-height: 1;
-    color: var(--white);
-    margin-bottom: 60px;
-  }
+    .nav-list {
+      display: flex;
+      gap: 1.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
 
-  /* ABOUT */
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: start;
-  }
-  .about-text p {
-    font-size: 16px;
-    line-height: 1.9;
-    color: #999;
-    margin-bottom: 20px;
-  }
-  .about-text p strong { color: var(--white); font-weight: 500; }
-  .stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-  }
-  .stat-box {
-    background: var(--grey);
-    padding: 36px 28px;
-    border-left: 3px solid var(--red);
-    transition: background 0.2s;
-  }
-  .stat-box:hover { background: #222; }
-  .stat-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 56px;
-    color: var(--white);
-    letter-spacing: 2px;
-    line-height: 1;
-  }
-  .stat-number span { color: var(--red); }
-  .stat-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-top: 8px;
-    text-transform: uppercase;
-  }
+    .nav-list a {
+      transition: color 0.25s ease;
+      position: relative;
+    }
 
-  /* FEATURED TRACK */
-  .featured-section {
-    background: var(--grey);
-    padding: 100px 0;
-  }
-  .featured-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 48px;
-  }
-  .track-card {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 60px;
-    align-items: center;
-    background: var(--black);
-    padding: 0;
-    overflow: hidden;
-    position: relative;
-  }
-  .track-info {
-    padding: 60px;
-  }
-  .track-badge {
-    display: inline-block;
-    background: var(--red);
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 3px;
-    padding: 6px 14px;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-    color: var(--white);
-  }
-  .track-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
-    letter-spacing: 2px;
-    line-height: 1;
-    color: var(--white);
-    margin-bottom: 8px;
-  }
-  .track-artist {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 28px;
-    text-transform: uppercase;
-  }
-  .track-desc {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.8;
-    margin-bottom: 36px;
-  }
-  .track-embed {
-    position: relative;
-    width: 100%;
-    background: #000;
-    aspect-ratio: 16/9;
-  }
-  .track-embed iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-  }
-  .waveform {
-    display: flex;
-    gap: 3px;
-    align-items: flex-end;
-    height: 40px;
-    margin-bottom: 32px;
-  }
-  .waveform-bar {
-    width: 3px;
-    background: var(--grey-mid);
-    border-radius: 2px;
-    animation: wave 1.2s ease-in-out infinite;
-  }
-  .waveform-bar:nth-child(odd) { background: var(--red); }
-  @keyframes wave {
-    0%, 100% { transform: scaleY(0.3); }
-    50% { transform: scaleY(1); }
-  }
+    .nav-list a:hover {
+      color: var(--text);
+    }
 
-  /* SKILLS */
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-  }
-  .skill-item {
-    padding: 40px 32px;
-    background: var(--grey);
-    position: relative;
-    overflow: hidden;
-    transition: background 0.2s;
-  }
-  .skill-item::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0;
-    height: 2px;
-    width: 0;
-    background: var(--red);
-    transition: width 0.4s ease;
-  }
-  .skill-item:hover::after { width: 100%; }
-  .skill-item:hover { background: #1e1e1e; }
-  .skill-icon {
-    font-size: 28px;
-    margin-bottom: 20px;
-    display: block;
-  }
-  .skill-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
-    letter-spacing: 2px;
-    color: var(--white);
-    margin-bottom: 10px;
-  }
-  .skill-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.7;
-  }
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 6rem 1.5rem 4rem;
+      text-align: center;
+    }
 
-  /* CONTACT */
-  .contact-section {
-    text-align: center;
-    padding: 120px 48px;
-    position: relative;
-    overflow: hidden;
-  }
-  .contact-section::before {
-    content: 'CONTACT';
-    position: absolute;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28vw;
-    color: rgba(255,45,45,0.03);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    white-space: nowrap;
-    pointer-events: none;
-    letter-spacing: 20px;
-  }
-  .contact-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 5px;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
-  .contact-heading {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(48px, 8vw, 100px);
-    letter-spacing: 2px;
-    line-height: 0.95;
-    color: var(--white);
-    margin-bottom: 40px;
-  }
-  .contact-heading .outline {
-    -webkit-text-stroke: 1px rgba(240,236,227,0.2);
-    color: transparent;
-  }
-  .contact-tagline {
-    font-size: 16px;
-    color: var(--muted);
-    margin-bottom: 56px;
-    font-style: italic;
-    font-family: 'Space Mono', monospace;
-  }
-  .contact-links {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .contact-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 32px;
-    border: 1px solid var(--grey-mid);
-    color: var(--white);
-    text-decoration: none;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    cursor: none;
-  }
-  .contact-link:hover {
-    border-color: var(--red);
-    background: rgba(255,45,45,0.07);
-    transform: translateY(-3px);
-  }
-  .contact-link svg { width: 16px; height: 16px; fill: var(--red); }
+    .hero-inner {
+      max-width: 900px;
+      width: 100%;
+      padding: 5rem 2.5rem;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(17,17,17,0.88);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+      backdrop-filter: blur(16px);
+      animation: reveal 0.9s ease both;
+    }
 
-  /* FOOTER */
-  footer {
-    border-top: 1px solid var(--grey);
-    padding: 32px 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 4px;
-    color: var(--muted);
-  }
-  .footer-copy {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: #333;
-    text-transform: uppercase;
-  }
+    .eyebrow {
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.35rem;
+      font-size: 0.72rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.92;
+    }
 
-  /* DIVIDER LINE */
-  .divider {
-    width: 100%;
-    height: 1px;
-    background: var(--grey);
-  }
+    .hero-title {
+      font-size: clamp(2.8rem, 6vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      margin-bottom: 1.5rem;
+      color: #fff;
+    }
 
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+    .hero-title span {
+      display: block;
+      color: var(--accent);
+    }
 
-  /* SCROLL REVEAL */
-  .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: none;
-  }
+    .hero-copy {
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.85;
+    }
 
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    nav { padding: 20px 24px; }
-    .nav-links { display: none; }
-    .hero { padding: 100px 24px 60px; }
-    section { padding: 80px 24px; }
-    .about-grid { grid-template-columns: 1fr; gap: 48px; }
-    .skills-grid { grid-template-columns: 1fr; }
-    .track-card { grid-template-columns: 1fr; }
-    .track-info { padding: 36px 24px; }
-    footer { flex-direction: column; gap: 12px; text-align: center; }
-    .featured-inner { padding: 0 24px; }
-    .contact-section { padding: 80px 24px; }
-    .contact-links { flex-direction: column; align-items: center; }
-    .stats { grid-template-columns: 1fr 1fr; }
-  }
-</style>
+    .hero-actions {
+      display: inline-flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.95rem 2rem;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--accent), #4ce0ff);
+      color: #000;
+      box-shadow: 0 18px 40px rgba(51,199,255,0.22);
+    }
+
+    .button-secondary {
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .section {
+      padding: 6rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .section-label {
+      font-size: 0.82rem;
+      letter-spacing: 0.35rem;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    .section-subtitle {
+      max-width: 700px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .work-grid {
+      display: grid;
+      gap: 1.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .video-card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .video-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+    }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+
+    .video-meta {
+      padding: 1.5rem 1.5rem 2rem;
+    }
+
+    .video-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+    }
+
+    .video-credit {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .services-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .service-card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 2rem;
+      display: grid;
+      gap: 1.25rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-alt);
+    }
+
+    .service-icon {
+      width: 3.2rem;
+      height: 3.2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: rgba(51,199,255,0.12);
+      color: var(--accent);
+      font-size: 1.5rem;
+    }
+
+    .service-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .service-copy {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .about-panel {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .about-heading {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .about-copy {
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: background 0.25s ease;
+    }
+
+    .stat-card:hover {
+      background: rgba(51,199,255,0.08);
+    }
+
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.2rem;
+      font-size: 0.8rem;
+    }
+
+    .contact-panel {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .contact-grid {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .contact-copy {
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .contact-links {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 1rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .contact-link:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .form-group {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .form-label {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 1rem 1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    .form-submit {
+      background: linear-gradient(135deg, var(--accent), #4ce0ff);
+      border: none;
+      color: #000;
+      padding: 1rem 1.8rem;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.25s ease;
+    }
+
+    .form-submit:hover {
+      transform: translateY(-2px);
+    }
+
+    footer {
+      padding: 2rem 1.5rem 3rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .about-grid,
+      .contact-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-inner {
+        padding: 3rem 1.5rem;
+      }
+
+      .page-wrap {
+        padding-top: 5.5rem;
+      }
+    }
+
+    @media (max-width: 680px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .nav-list {
+        gap: 1rem;
+      }
+
+      .section {
+        padding: 4rem 1rem;
+      }
+
+      .hero {
+        padding: 5.5rem 1rem 3rem;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<!-- CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">NABA<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#work">Work</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<section class="hero" style="max-width:100%; padding-left:48px; padding-right:48px;">
-  <div class="hero-bg"></div>
-  <div class="hero-tag">Beat Producer &amp; Music Creator</div>
-  <h1 class="hero-name">
-    NABA<br>
-    <span class="outline">RAJ</span><br>
-    <span class="red">KC</span>
-  </h1>
-  <p class="hero-sub">
-    Crafting raw, authentic beats that tell stories. From trap to street — every track hits different.
-  </p>
-  <div class="hero-cta">
-    <a href="#work" class="btn-primary">Hear My Work</a>
-    <a href="#contact" class="btn-ghost">Get In Touch →</a>
-  </div>
-</section>
-
-<!-- TICKER -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <span>BEAT PRODUCER</span><span class="dot">●</span>
-    <span>NABARAJ KC</span><span class="dot">●</span>
-    <span>TRAP</span><span class="dot">●</span>
-    <span>STREET LIFE</span><span class="dot">●</span>
-    <span>KATHMANDU</span><span class="dot">●</span>
-    <span>MUSIC PRODUCTION</span><span class="dot">●</span>
-    <span>NABA BEATS</span><span class="dot">●</span>
-    <span>BEAT PRODUCER</span><span class="dot">●</span>
-    <span>NABARAJ KC</span><span class="dot">●</span>
-    <span>TRAP</span><span class="dot">●</span>
-    <span>STREET LIFE</span><span class="dot">●</span>
-    <span>KATHMANDU</span><span class="dot">●</span>
-    <span>MUSIC PRODUCTION</span><span class="dot">●</span>
-    <span>NABA BEATS</span><span class="dot">●</span>
-  </div>
-</div>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-label">Who I Am</div>
-  <h2 class="section-title">ABOUT<br>NABA</h2>
-  <div class="about-grid reveal">
-    <div class="about-text">
-      <p>
-        I'm <strong>Nabaraj KC</strong> — a beat producer based in Kathmandu, crafting
-        cinematic, hard-hitting instrumentals for artists who want their music to
-        <strong>mean something</strong>.
-      </p>
-      <p>
-        My sound lives at the intersection of street energy and atmospheric depth.
-        Whether it's a dark trap banger or a soulful melodic beat, I build tracks
-        that give artists room to <strong>tell their truth</strong>.
-      </p>
-      <p>
-        From producing for emerging artists to building sonic identities from scratch —
-        I bring technical precision and raw creativity to every session.
-      </p>
-    </div>
-    <div class="stats reveal">
-      <div class="stat-box">
-        <div class="stat-number">50<span>+</span></div>
-        <div class="stat-label">Beats Produced</div>
+  <div class="page-wrap">
+    <nav>
+      <div class="brand">NABA BEATS</div>
+      <div class="nav-list">
+        <a href="#hero">Home</a>
+        <a href="#featured">Featured</a>
+        <a href="#services">Services</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
       </div>
-      <div class="stat-box">
-        <div class="stat-number">100<span>%</span></div>
-        <div class="stat-label">Original Sounds</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">1<span>K+</span></div>
-        <div class="stat-label">IG Followers</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">∞</div>
-        <div class="stat-label">Passion for Music</div>
-      </div>
-    </div>
+    </nav>
+
+    <main>
+      <section id="hero" class="hero">
+        <div class="hero-inner">
+          <div class="eyebrow">High-End Studio • Modern Minimalist</div>
+          <h1 class="hero-title">Naba Beats — Professional Music Production &amp; Engineering</h1>
+          <p class="hero-copy">Delivering radio-ready sound for independent artists and established names. Full-scale production, premium vocal tracking, and polished mixing/mastering that brings every record to life.</p>
+          <div class="hero-actions">
+            <a href="#contact" class="button button-primary">Book Your Session</a>
+            <a href="#featured" class="button button-secondary">Explore Featured Work</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="featured" class="section fade-up">
+        <div class="section-header">
+          <div class="section-label">Featured Work</div>
+          <h2 class="section-title">Video Gallery</h2>
+          <p class="section-subtitle">Select projects that demonstrate Naba's production, arrangement, and technical engineering range across hip-hop, melodic music, and full-service audio polish.</p>
+        </div>
+
+        <div class="work-grid">
+          <article class="video-card">
+            <div class="video-frame">
+              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/Nk-Q1ZMUlNY?rel=0" title="Lil Alien Street Life" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta">
+              <h3 class="video-title">Lil Alien — "Street Life"</h3>
+              <p class="video-credit">Produced by Naba. A hard-hitting beat that showcases modern trap energy with cinematic low-end and tight, punchy percussion.</p>
+            </div>
+          </article>
+
+          <article class="video-card">
+            <div class="video-frame">
+              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/1sGNGiEBCa0?rel=0" title="Basanta Raj Giri Bagar" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta">
+              <h3 class="video-title">Basanta Raj Giri — "Bagar"</h3>
+              <p class="video-credit">Music produced by Naba. A melodic arrangement with emotional depth that bridges modern production and traditional musicality.</p>
+            </div>
+          </article>
+
+          <article class="video-card">
+            <div class="video-frame">
+              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/2ss48Jvaqxc?rel=0" title="Double XL Buddha" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta">
+              <h3 class="video-title">Double XL — "Buddha"</h3>
+              <p class="video-credit">Recorded, mixed, &amp; mastered by Naba. Technical audio engineering that delivers clarity, punch, and an immersive final polish.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="services" class="section fade-up">
+        <div class="section-header">
+          <div class="section-label">Studio Services</div>
+          <h2 class="section-title">What I Offer</h2>
+          <p class="section-subtitle">Studio-grade workflows for artists who want every element of their music to feel premium, polished, and ready for release.</p>
+        </div>
+
+        <div class="services-grid">
+          <div class="service-card">
+            <div class="service-icon">🎧</div>
+            <h3 class="service-title">Full Music Production</h3>
+            <p class="service-copy">From concept to final arrangement: beats, melodies, song structure, and professional production for hip-hop, trap, and melodic records.</p>
+          </div>
+          <div class="service-card">
+            <div class="service-icon">🎙️</div>
+            <h3 class="service-title">Professional Vocal Recording</h3>
+            <p class="service-copy">Premium vocal tracking with detailed coaching, studio-grade capture, and a clean signal chain geared toward powerful vocal performances.</p>
+          </div>
+          <div class="service-card">
+            <div class="service-icon">⚙️</div>
+            <h3 class="service-title">Mixing &amp; Mastering</h3>
+            <p class="service-copy">Precision mixing and mastering that balances loudness, tonality, and translation across streaming platforms, radio, and club systems.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section fade-up">
+        <div class="section-header">
+          <div class="section-label">About Naba</div>
+          <h2 class="section-title">Industry Experience</h2>
+          <p class="section-subtitle">Eight years delivering professional production and engineering for underground artists, emerging talent, and established acts seeking a modern studio edge.</p>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-panel">
+            <h3 class="about-heading">Studio-Grade Sound, Every Time</h3>
+            <p class="about-copy">I help artists turn their vision into high-impact records with attention to detail at every stage. Whether you need a full production, vocal session, or final mix and master, I provide a premium experience built around clarity, power, and musicality.</p>
+            <p class="about-copy">My work is rooted in rhythm, texture, and vocal presence. I combine the energy of modern hip-hop and trap with a polished engineering approach that makes every track feel current and competitive.</p>
+          </div>
+
+          <div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Years Experience</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">500+</div>
+                <div class="stat-label">Tracks Produced</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">120+</div>
+                <div class="stat-label">Artists Collaborated</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Studio-Ready Results</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section fade-up">
+        <div class="section-header">
+          <div class="section-label">Contact</div>
+          <h2 class="section-title">Book Your Session</h2>
+          <p class="section-subtitle">Ready to work on your next record? Send a message, and let’s talk timelines, creative direction, and your vision for the track.</p>
+        </div>
+
+        <div class="contact-panel">
+          <div class="contact-grid">
+            <div>
+              <p class="contact-copy">Use the form to reach out directly or connect on Instagram for the latest session updates and release highlights.</p>
+              <div class="contact-links">
+                <a href="mailto:nababeats@gmail.com" class="contact-link">✉️ nababeats@gmail.com</a>
+                <a href="https://www.instagram.com/naba_rajkc/" target="_blank" class="contact-link">📸 @naba_rajkc</a>
+              </div>
+            </div>
+            <form class="contact-form" action="mailto:nababeats@gmail.com" method="post" enctype="text/plain">
+              <div class="form-group">
+                <label class="form-label" for="name">Name</label>
+                <input class="form-control" type="text" id="name" name="name" placeholder="Your name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" type="email" id="email" name="email" placeholder="you@email.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="message">Message</label>
+                <textarea class="form-control" id="message" name="message" rows="5" placeholder="Tell me about your project" required></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="form-submit" type="submit">Send Request</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © 2026 Naba Beats. Professional Music Production &amp; Audio Engineering.
+    </footer>
   </div>
-</section>
 
-<div class="divider"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('.fade-up');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
 
-<!-- FEATURED WORK -->
-<div class="featured-section" id="work">
-  <div class="featured-inner">
-    <div class="section-label" style="margin-bottom:16px;">Recent Work</div>
-    <h2 class="section-title">FEATURED<br>TRACK</h2>
-    <div class="track-card reveal">
-      <div class="track-info">
-        <span class="track-badge">Now Playing</span>
-        <h3 class="track-title">STREET<br>LIFE</h3>
-        <p class="track-artist">Lil Alien — Prod. by Naba</p>
-        <div class="waveform" id="waveform"></div>
-        <p class="track-desc">
-          A raw street anthem built on heavy 808s, cinematic strings, and a trap feel
-          that captures the grind and hustle of real life. This is what Naba Beats sounds like.
-        </p>
-        <a href="https://youtu.be/Nk-Q1ZMUlNY?si=azQxankcAdl_4S3P" target="_blank" class="btn-primary">▶ Watch on YouTube</a>
-      </div>
-      <div class="track-embed">
-        <iframe
-          src="https://www.youtube.com/embed/Nk-Q1ZMUlNY?si=azQxankcAdl_4S3P&rel=0"
-          title="Lil Alien - Street Life Prod by Naba"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SKILLS -->
-<section id="skills">
-  <div class="section-label">What I Do</div>
-  <h2 class="section-title">SKILLS &amp;<br>SERVICES</h2>
-  <div class="skills-grid reveal">
-    <div class="skill-item">
-      <span class="skill-icon">🎛️</span>
-      <div class="skill-name">Beat Making</div>
-      <p class="skill-desc">Custom beats crafted from scratch — trap, drill, hip-hop, R&B. Every element designed to serve the artist's vision.</p>
-    </div>
-    <div class="skill-item">
-      <span class="skill-icon">🎚️</span>
-      <div class="skill-name">Mixing</div>
-      <p class="skill-desc">Clean, professional mixes that make your vocals sit right in the pocket, with depth and clarity that translates on any speaker.</p>
-    </div>
-    <div class="skill-item">
-      <span class="skill-icon">🔊</span>
-      <div class="skill-name">Sound Design</div>
-      <p class="skill-desc">Unique textures, atmospheres and 808s built from the ground up. No cookie-cutter kits — original sounds only.</p>
-    </div>
-    <div class="skill-item">
-      <span class="skill-icon">🎵</span>
-      <div class="skill-name">Melody Crafting</div>
-      <p class="skill-desc">Cinematic, emotional melodies that hook listeners instantly. From dark strings to punchy piano lines.</p>
-    </div>
-    <div class="skill-item">
-      <span class="skill-icon">🎤</span>
-      <div class="skill-name">Artist Collabs</div>
-      <p class="skill-desc">Open to working with artists of all levels. Let's build something together that represents your sound authentically.</p>
-    </div>
-    <div class="skill-item">
-      <span class="skill-icon">📲</span>
-      <div class="skill-name">Online Sessions</div>
-      <p class="skill-desc">Work with me remotely. Send your references, vibe references, or lyrics — I'll build the beat around your world.</p>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- CONTACT -->
-<div class="contact-section" id="contact">
-  <p class="contact-label">Let's Create</p>
-  <h2 class="contact-heading">
-    LET'S<br>
-    <span class="outline">MAKE</span><br>
-    MUSIC
-  </h2>
-  <p class="contact-tagline">"The beat starts here. Where does your story go?"</p>
-  <div class="contact-links reveal">
-    <a href="mailto:nababeats@gmail.com" class="contact-link">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-      nababeats@gmail.com
-    </a>
-    <a href="https://www.instagram.com/naba_rajkc/" target="_blank" class="contact-link">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-      @naba_rajkc
-    </a>
-    <a href="https://youtu.be/Nk-Q1ZMUlNY?si=azQxankcAdl_4S3P" target="_blank" class="contact-link">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-      YouTube
-    </a>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">NABA BEATS</div>
-  <div class="footer-copy">© 2025 Nabaraj KC — All rights reserved</div>
-</footer>
-
-<script>
-  // CURSOR
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-  });
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-  document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.width = '20px';
-      cursor.style.height = '20px';
-      ring.style.width = '56px';
-      ring.style.height = '56px';
-      ring.style.borderColor = 'rgba(255,45,45,0.8)';
+      sections.forEach(section => observer.observe(section));
     });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.width = '12px';
-      cursor.style.height = '12px';
-      ring.style.width = '36px';
-      ring.style.height = '36px';
-      ring.style.borderColor = 'rgba(255,45,45,0.5)';
-    });
-  });
-
-  // WAVEFORM
-  const waveform = document.getElementById('waveform');
-  for (let i = 0; i < 28; i++) {
-    const bar = document.createElement('div');
-    bar.className = 'waveform-bar';
-    const h = Math.random() * 32 + 8;
-    bar.style.height = h + 'px';
-    bar.style.animationDelay = (i * 0.07) + 's';
-    bar.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
-    waveform.appendChild(bar);
-  }
-
-  // SCROLL REVEAL
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-      }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => observer.observe(el));
-</script>
+  </script>
 </body>
 </html>
