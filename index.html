@@ -1,699 +1,297 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Naba Beats — Music Production & Engineering</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #070707;
-      --panel: #111111;
-      --panel-soft: #181818;
-      --text: #f4f4f4;
-      --muted: #9aa2b1;
-      --accent: #33c7ff;
-      --accent-alt: #ff6b42;
-      --border: rgba(255,255,255,0.08);
-      --shadow: 0 28px 80px rgba(0,0,0,0.28);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background: radial-gradient(circle at top left, rgba(51,199,255,0.08), transparent 28%),
-                  radial-gradient(circle at bottom right, rgba(255,107,66,0.08), transparent 26%),
-                  var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cpath fill="rgba(255,255,255,0.02)" d="M0 0h100v100H0z"/%3E%3C/svg%3E');
-      opacity: 0.12;
-      pointer-events: none;
-    }
-
-    a { color: inherit; text-decoration: none; }
-
-    .page-wrap {
-      position: relative;
-      z-index: 1;
-    }
-
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 1.2rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      backdrop-filter: blur(24px);
-      background: rgba(7,7,7,0.82);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      z-index: 10;
-    }
-
-    .brand {
-      font-weight: 700;
-      letter-spacing: 0.25rem;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-
-    .nav-list {
-      display: flex;
-      gap: 1.8rem;
-      align-items: center;
-      flex-wrap: wrap;
-      font-size: 0.92rem;
-      color: var(--muted);
-    }
-
-    .nav-list a {
-      transition: color 0.25s ease;
-      position: relative;
-    }
-
-    .nav-list a:hover {
-      color: var(--text);
-    }
-
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 6rem 1.5rem 4rem;
-      text-align: center;
-    }
-
-    .hero-inner {
-      max-width: 900px;
-      width: 100%;
-      padding: 5rem 2.5rem;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(17,17,17,0.88);
-      box-shadow: var(--shadow);
-      border-radius: 28px;
-      backdrop-filter: blur(16px);
-      animation: reveal 0.9s ease both;
-    }
-
-    .eyebrow {
-      text-transform: uppercase;
-      color: var(--accent);
-      letter-spacing: 0.35rem;
-      font-size: 0.72rem;
-      margin-bottom: 1.5rem;
-      opacity: 0.92;
-    }
-
-    .hero-title {
-      font-size: clamp(2.8rem, 6vw, 4.8rem);
-      line-height: 0.95;
-      letter-spacing: -0.06em;
-      margin-bottom: 1.5rem;
-      color: #fff;
-    }
-
-    .hero-title span {
-      display: block;
-      color: var(--accent);
-    }
-
-    .hero-copy {
-      max-width: 640px;
-      margin: 0 auto 2.5rem;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.85;
-    }
-
-    .hero-actions {
-      display: inline-flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.95rem 2rem;
-      border-radius: 999px;
-      font-weight: 600;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-    }
-
-    .button-primary {
-      background: linear-gradient(135deg, var(--accent), #4ce0ff);
-      color: #000;
-      box-shadow: 0 18px 40px rgba(51,199,255,0.22);
-    }
-
-    .button-secondary {
-      border: 1px solid rgba(255,255,255,0.14);
-      color: var(--text);
-      background: rgba(255,255,255,0.02);
-    }
-
-    .button:hover {
-      transform: translateY(-2px);
-    }
-
-    .section {
-      padding: 6rem 1.5rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 3rem;
-      text-align: center;
-    }
-
-    .section-label {
-      font-size: 0.82rem;
-      letter-spacing: 0.35rem;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    .section-title {
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-    }
-
-    .section-subtitle {
-      max-width: 700px;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .work-grid {
-      display: grid;
-      gap: 1.75rem;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-
-    .video-card {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s ease, border-color 0.3s ease;
-    }
-
-    .video-card:hover {
-      transform: translateY(-6px);
-      border-color: var(--accent);
-    }
-
-    .video-frame {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #000;
-    }
-
-    .video-meta {
-      padding: 1.5rem 1.5rem 2rem;
-    }
-
-    .video-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 0.85rem;
-    }
-
-    .video-credit {
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 0.95rem;
-    }
-
-    .services-grid {
-      display: grid;
-      gap: 1.5rem;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    }
-
-    .service-card {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 22px;
-      padding: 2rem;
-      display: grid;
-      gap: 1.25rem;
-      box-shadow: var(--shadow);
-      transition: transform 0.25s ease, border-color 0.25s ease;
-    }
-
-    .service-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-alt);
-    }
-
-    .service-icon {
-      width: 3.2rem;
-      height: 3.2rem;
-      display: grid;
-      place-items: center;
-      border-radius: 18px;
-      background: rgba(51,199,255,0.12);
-      color: var(--accent);
-      font-size: 1.5rem;
-    }
-
-    .service-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .service-copy {
-      color: var(--muted);
-      line-height: 1.75;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2.5rem;
-      align-items: center;
-    }
-
-    .about-panel {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 28px;
-      padding: 2.5rem;
-      box-shadow: var(--shadow);
-    }
-
-    .about-heading {
-      font-size: 2.2rem;
-      margin-bottom: 1rem;
-    }
-
-    .about-copy {
-      color: var(--muted);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .stat-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: background 0.25s ease;
-    }
-
-    .stat-card:hover {
-      background: rgba(51,199,255,0.08);
-    }
-
-    .stat-value {
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.2rem;
-      font-size: 0.8rem;
-    }
-
-    .contact-panel {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 28px;
-      padding: 2.5rem;
-      box-shadow: var(--shadow);
-    }
-
-    .contact-grid {
-      display: grid;
-      gap: 2rem;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .contact-copy {
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .contact-links {
-      display: grid;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .contact-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.9rem;
-      padding: 1rem 1.25rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.02);
-      color: var(--text);
-      transition: border-color 0.25s ease, transform 0.25s ease;
-    }
-
-    .contact-link:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    .form-group {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .form-label {
-      font-size: 0.95rem;
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 1rem 1rem;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      color: var(--text);
-      font: inherit;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: rgba(255,255,255,0.05);
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 1rem;
-    }
-
-    .form-submit {
-      background: linear-gradient(135deg, var(--accent), #4ce0ff);
-      border: none;
-      color: #000;
-      padding: 1rem 1.8rem;
-      border-radius: 999px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.25s ease;
-    }
-
-    .form-submit:hover {
-      transform: translateY(-2px);
-    }
-
-    footer {
-      padding: 2rem 1.5rem 3rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .fade-up {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @keyframes reveal {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 900px) {
-      .about-grid,
-      .contact-grid,
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-inner {
-        padding: 3rem 1.5rem;
-      }
-
-      .page-wrap {
-        padding-top: 5.5rem;
-      }
-    }
-
-    @media (max-width: 680px) {
-      nav {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-
-      .nav-list {
-        gap: 1rem;
-      }
-
-      .section {
-        padding: 4rem 1rem;
-      }
-
-      .hero {
-        padding: 5.5rem 1rem 3rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="page-wrap">
-    <nav>
-      <div class="brand">NABA BEATS</div>
-      <div class="nav-list">
-        <a href="#hero">Home</a>
-        <a href="#featured">Featured</a>
-        <a href="#services">Services</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </nav>
-
-    <main>
-      <section id="hero" class="hero">
-        <div class="hero-inner">
-          <div class="eyebrow">High-End Studio • Modern Minimalist</div>
-          <h1 class="hero-title">Naba Beats — Professional Music Production &amp; Engineering</h1>
-          <p class="hero-copy">Delivering radio-ready sound for independent artists and established names. Full-scale production, premium vocal tracking, and polished mixing/mastering that brings every record to life.</p>
-          <div class="hero-actions">
-            <a href="#contact" class="button button-primary">Book Your Session</a>
-            <a href="#featured" class="button button-secondary">Explore Featured Work</a>
+import React, { useState, useEffect } from 'react';
+import { 
+  Instagram, 
+  Mail, 
+  Play, 
+  Music, 
+  Mic2, 
+  Sliders, 
+  CheckCircle, 
+  Send, 
+  Menu, 
+  X,
+  ChevronRight,
+  ExternalLink
+} from 'lucide-react';
+
+const App = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Handle scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const projects = [
+    {
+      title: "Street Life",
+      artist: "Lil Alien",
+      role: "Produced by Naba",
+      videoUrl: "https://www.youtube.com/embed/Nk-Q1ZMUlNY",
+      thumbnail: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800",
+      tag: "Hip-Hop / Trap"
+    },
+    {
+      title: "Bagar",
+      artist: "Basanta Raj Giri",
+      role: "Music Produced by Naba",
+      videoUrl: "https://www.youtube.com/embed/ktrAbr5GFts",
+      thumbnail: "https://images.unsplash.com/photo-1514525253361-bee8718a340b?auto=format&fit=crop&q=80&w=800",
+      tag: "Modern Folk / Pop"
+    },
+    {
+      title: "Buddha",
+      artist: "IT'S DOUBLE XL",
+      role: "Record, Mix & Master by Naba",
+      videoUrl: "https://www.youtube.com/embed/u4FFQBoY8N4",
+      thumbnail: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800",
+      tag: "Rap / Engineering"
+    }
+  ];
+
+  const services = [
+    {
+      icon: <Music className="w-8 h-8 text-orange-500" />,
+      title: "Full Production",
+      desc: "From basic melody to a full arrangement. Custom beats and creative direction tailored to your style.",
+      price: "Starting at $300 / NRs 40,000"
+    },
+    {
+      icon: <Sliders className="w-8 h-8 text-orange-500" />,
+      title: "Mixing & Mastering",
+      desc: "Industry standard sonic polish. Clarity, depth, and the 'loudness' needed for Spotify and Apple Music.",
+      price: "Starting at $150 / NRs 20,000"
+    },
+    {
+      icon: <Mic2 className="w-8 h-8 text-orange-500" />,
+      title: "Vocal Engineering",
+      desc: "High-end vocal tracking, pitch correction, and professional vocal processing chains.",
+      price: "Starting at $40 / hr"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-orange-500 selection:text-white">
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-zinc-950/90 backdrop-blur-md py-4 shadow-xl' : 'bg-transparent py-6'}`}>
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="text-2xl font-black tracking-tighter text-white">
+            NABA<span className="text-orange-500">BEATS</span>
+          </div>
+          
+          <div className="hidden md:flex space-x-8 items-center">
+            <a href="#work" className="hover:text-orange-500 transition-colors">Work</a>
+            <a href="#services" className="hover:text-orange-500 transition-colors">Services</a>
+            <a href="#about" className="hover:text-orange-500 transition-colors">About</a>
+            <a href="#contact" className="bg-orange-600 hover:bg-orange-700 px-6 py-2 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95">
+              Book a Session
+            </a>
+          </div>
+
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-40 bg-zinc-950 flex flex-col items-center justify-center space-y-8 text-2xl font-bold md:hidden">
+          <a href="#work" onClick={() => setIsMenuOpen(false)}>Work</a>
+          <a href="#services" onClick={() => setIsMenuOpen(false)}>Services</a>
+          <a href="#about" onClick={() => setIsMenuOpen(false)}>About</a>
+          <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-orange-500">Contact</a>
+        </div>
+      )}
+
+      {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/50 to-zinc-950 z-10"></div>
+          <img 
+            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1920" 
+            className="w-full h-full object-cover opacity-40"
+            alt="Studio Background"
+          />
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-20 text-center">
+          <h4 className="text-orange-500 font-bold tracking-widest uppercase mb-4">8+ Years of Industry Experience</h4>
+          <h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tighter leading-none">
+            SONIC <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600">EXCELLENCE</span><br/>FOR EVERY ARTIST.
+          </h1>
+          <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10">
+            Professional Music Producer & Audio Engineer helping artists achieve a radio-ready sound through premium production, mixing, and mastering.
+          </p>
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <a href="#work" className="bg-white text-black px-8 py-4 rounded-full font-bold flex items-center justify-center hover:bg-zinc-200 transition-colors">
+              View My Work <ChevronRight className="ml-2 w-5 h-5" />
+            </a>
+            <a href="#contact" className="border border-zinc-700 px-8 py-4 rounded-full font-bold hover:bg-zinc-800 transition-colors">
+              Get a Quote
+            </a>
           </div>
         </div>
       </section>
 
-      <section id="featured" class="section fade-up">
-        <div class="section-header">
-          <div class="section-label">Featured Work</div>
-          <h2 class="section-title">Video Gallery</h2>
-          <p class="section-subtitle">Select projects that demonstrate Naba's production, arrangement, and technical engineering range across hip-hop, melodic music, and full-service audio polish.</p>
-        </div>
-
-        <div class="work-grid">
-          <article class="video-card">
-            <div class="video-frame">
-              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/Nk-Q1ZMUlNY?rel=0" title="Lil Alien Street Life" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <div class="video-meta">
-              <h3 class="video-title">Lil Alien — "Street Life"</h3>
-              <p class="video-credit">Produced by Naba. A hard-hitting beat that showcases modern trap energy with cinematic low-end and tight, punchy percussion.</p>
-            </div>
-          </article>
-
-          <article class="video-card">
-            <div class="video-frame">
-              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/1sGNGiEBCa0?rel=0" title="Basanta Raj Giri Bagar" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <div class="video-meta">
-              <h3 class="video-title">Basanta Raj Giri — "Bagar"</h3>
-              <p class="video-credit">Music produced by Naba. A melodic arrangement with emotional depth that bridges modern production and traditional musicality.</p>
-            </div>
-          </article>
-
-          <article class="video-card">
-            <div class="video-frame">
-              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/2ss48Jvaqxc?rel=0" title="Double XL Buddha" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <div class="video-meta">
-              <h3 class="video-title">Double XL — "Buddha"</h3>
-              <p class="video-credit">Recorded, mixed, &amp; mastered by Naba. Technical audio engineering that delivers clarity, punch, and an immersive final polish.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="services" class="section fade-up">
-        <div class="section-header">
-          <div class="section-label">Studio Services</div>
-          <h2 class="section-title">What I Offer</h2>
-          <p class="section-subtitle">Studio-grade workflows for artists who want every element of their music to feel premium, polished, and ready for release.</p>
-        </div>
-
-        <div class="services-grid">
-          <div class="service-card">
-            <div class="service-icon">🎧</div>
-            <h3 class="service-title">Full Music Production</h3>
-            <p class="service-copy">From concept to final arrangement: beats, melodies, song structure, and professional production for hip-hop, trap, and melodic records.</p>
-          </div>
-          <div class="service-card">
-            <div class="service-icon">🎙️</div>
-            <h3 class="service-title">Professional Vocal Recording</h3>
-            <p class="service-copy">Premium vocal tracking with detailed coaching, studio-grade capture, and a clean signal chain geared toward powerful vocal performances.</p>
-          </div>
-          <div class="service-card">
-            <div class="service-icon">⚙️</div>
-            <h3 class="service-title">Mixing &amp; Mastering</h3>
-            <p class="service-copy">Precision mixing and mastering that balances loudness, tonality, and translation across streaming platforms, radio, and club systems.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="about" class="section fade-up">
-        <div class="section-header">
-          <div class="section-label">About Naba</div>
-          <h2 class="section-title">Industry Experience</h2>
-          <p class="section-subtitle">Eight years delivering professional production and engineering for underground artists, emerging talent, and established acts seeking a modern studio edge.</p>
-        </div>
-
-        <div class="about-grid">
-          <div class="about-panel">
-            <h3 class="about-heading">Studio-Grade Sound, Every Time</h3>
-            <p class="about-copy">I help artists turn their vision into high-impact records with attention to detail at every stage. Whether you need a full production, vocal session, or final mix and master, I provide a premium experience built around clarity, power, and musicality.</p>
-            <p class="about-copy">My work is rooted in rhythm, texture, and vocal presence. I combine the energy of modern hip-hop and trap with a polished engineering approach that makes every track feel current and competitive.</p>
-          </div>
-
-          <div>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-value">8</div>
-                <div class="stat-label">Years Experience</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value">500+</div>
-                <div class="stat-label">Tracks Produced</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value">120+</div>
-                <div class="stat-label">Artists Collaborated</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value">100%</div>
-                <div class="stat-label">Studio-Ready Results</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" class="section fade-up">
-        <div class="section-header">
-          <div class="section-label">Contact</div>
-          <h2 class="section-title">Book Your Session</h2>
-          <p class="section-subtitle">Ready to work on your next record? Send a message, and let’s talk timelines, creative direction, and your vision for the track.</p>
-        </div>
-
-        <div class="contact-panel">
-          <div class="contact-grid">
+      {/* Work Section */}
+      <section id="work" className="py-24 bg-zinc-950">
+        <div className="container mx-auto px-6">
+          <div className="flex justify-between items-end mb-12">
             <div>
-              <p class="contact-copy">Use the form to reach out directly or connect on Instagram for the latest session updates and release highlights.</p>
-              <div class="contact-links">
-                <a href="mailto:nababeats@gmail.com" class="contact-link">✉️ nababeats@gmail.com</a>
-                <a href="https://www.instagram.com/naba_rajkc/" target="_blank" class="contact-link">📸 @naba_rajkc</a>
+              <h2 className="text-4xl font-bold mb-2">Recent Hits</h2>
+              <p className="text-zinc-500">A selection of projects I've produced and engineered.</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {projects.map((project, idx) => (
+              <div key={idx} className="group bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 hover:border-orange-500/50 transition-all shadow-2xl">
+                <div className="aspect-video relative">
+                  <iframe 
+                    className="w-full h-full"
+                    src={project.videoUrl} 
+                    title={project.title}
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <div className="p-6">
+                  <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">{project.tag}</span>
+                  <h3 className="text-xl font-bold mt-2">{project.title}</h3>
+                  <p className="text-zinc-400 font-medium">{project.artist}</p>
+                  <div className="mt-4 pt-4 border-t border-zinc-800 flex items-center text-zinc-500 text-sm">
+                    <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                    {project.role}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-24 bg-zinc-900/50 border-y border-zinc-800">
+        <div className="container mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl font-bold mb-4">Professional Audio Services</h2>
+            <p className="text-zinc-400">Everything you need to take your sound from a rough demo to a globally distributed hit.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {services.map((service, idx) => (
+              <div key={idx} className="p-8 bg-zinc-950 rounded-3xl border border-zinc-800 hover:shadow-orange-500/5 transition-all">
+                <div className="mb-6">{service.icon}</div>
+                <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
+                <p className="text-zinc-500 mb-8 leading-relaxed">{service.desc}</p>
+                <div className="text-orange-500 font-bold tracking-tight">{service.price}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-24 bg-zinc-950">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-16">
+            <div className="w-full md:w-1/2 relative">
+              <div className="absolute -inset-4 bg-orange-600 rounded-2xl rotate-3 z-0 opacity-20"></div>
+              <img 
+                src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800" 
+                alt="Naba in the studio" 
+                className="rounded-2xl relative z-10 w-full shadow-2xl grayscale hover:grayscale-0 transition-all duration-700"
+              />
+            </div>
+            <div className="w-full md:w-1/2">
+              <h2 className="text-4xl font-bold mb-6">Meet Naba</h2>
+              <p className="text-zinc-400 text-lg leading-relaxed mb-6">
+                With over 8 years of experience behind the console, I specialize in transforming raw creative ideas into radio-ready records. 
+                As a producer and engineer, I’ve had the privilege of working across a diverse sonic landscape—from hard-hitting Hip-Hop energy 
+                to melodic depth and traditional fusions.
+              </p>
+              <p className="text-zinc-400 text-lg leading-relaxed mb-8">
+                My approach combines technical precision with a musician’s soul. I don't just "mix" tracks; I build experiences that connect 
+                artists to their listeners on a deeper level.
+              </p>
+              <div className="flex space-x-6">
+                <a href="https://www.instagram.com/naba_rajkc" target="_blank" className="flex items-center text-orange-500 font-bold hover:underline">
+                  <Instagram className="mr-2" /> Follow on IG
+                </a>
+                <a href="mailto:nababeats@gmail.com" className="flex items-center text-white font-bold hover:underline">
+                  <Mail className="mr-2" /> Email Me
+                </a>
               </div>
             </div>
-            <form class="contact-form" action="mailto:nababeats@gmail.com" method="post" enctype="text/plain">
-              <div class="form-group">
-                <label class="form-label" for="name">Name</label>
-                <input class="form-control" type="text" id="name" name="name" placeholder="Your name" required>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-24 bg-orange-600">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto bg-zinc-950 rounded-[3rem] p-8 md:p-16 shadow-2xl">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-black mb-4">Start Your Next Project</h2>
+              <p className="text-zinc-400">Tell me about your music. Let's create something legendary.</p>
+            </div>
+
+            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-zinc-500 uppercase mb-2">Name / Artist Alias</label>
+                  <input type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:border-orange-500 outline-none transition-all" placeholder="Enter your name" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-zinc-500 uppercase mb-2">Email Address</label>
+                  <input type="email" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:border-orange-500 outline-none transition-all" placeholder="nababeats@gmail.com" />
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="email">Email</label>
-                <input class="form-control" type="email" id="email" name="email" placeholder="you@email.com" required>
+              
+              <div>
+                <label className="block text-sm font-bold text-zinc-500 uppercase mb-2">What service do you need?</label>
+                <select className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:border-orange-500 outline-none transition-all">
+                  <option>Full Production Bundle</option>
+                  <option>Mixing & Mastering</option>
+                  <option>Vocal Recording</option>
+                  <option>Custom Beat Request</option>
+                </select>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="message">Message</label>
-                <textarea class="form-control" id="message" name="message" rows="5" placeholder="Tell me about your project" required></textarea>
+
+              <div>
+                <label className="block text-sm font-bold text-zinc-500 uppercase mb-2">Project Details</label>
+                <textarea rows="4" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:border-orange-500 outline-none transition-all" placeholder="Tell me about your vibe, deadline, and reference tracks..."></textarea>
               </div>
-              <div class="form-actions">
-                <button class="form-submit" type="submit">Send Request</button>
-              </div>
+
+              <button className="w-full bg-orange-600 hover:bg-orange-700 py-4 rounded-xl font-black text-xl flex items-center justify-center transition-all shadow-xl">
+                SEND MESSAGE <Send className="ml-3 w-6 h-6" />
+              </button>
             </form>
           </div>
         </div>
       </section>
-    </main>
 
-    <footer>
-      © 2026 Naba Beats. Professional Music Production &amp; Audio Engineering.
-    </footer>
-  </div>
+      {/* Footer */}
+      <footer className="py-12 border-t border-zinc-900 text-center text-zinc-600">
+        <div className="container mx-auto px-6">
+          <div className="text-xl font-black mb-6 text-zinc-400">NABA BEATS</div>
+          <div className="flex justify-center space-x-6 mb-8">
+            <a href="https://www.instagram.com/naba_rajkc" target="_blank" className="hover:text-white transition-colors"><Instagram /></a>
+            <a href="mailto:nababeats@gmail.com" className="hover:text-white transition-colors"><Mail /></a>
+            <a href="#" className="hover:text-white transition-colors"><Play /></a>
+          </div>
+          <p>© 2026 Naba Beats. Built for High-Performance Audio.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sections = document.querySelectorAll('.fade-up');
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15 });
-
-      sections.forEach(section => observer.observe(section));
-    });
-  </script>
-</body>
-</html>
+export default App;
